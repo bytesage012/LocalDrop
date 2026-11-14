@@ -195,7 +195,6 @@
             transform: rotate(15deg);
         }
 
-        /* ---------- MODE SELECTOR ---------- */
         .mode-selector {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -387,7 +386,6 @@
 
         .card-title.receive-title svg { fill: var(--receive-accent); }
 
-        /* ---------- SEND VIEW ---------- */
         .dropzone {
             border: 2px dashed var(--dropzone-border);
             border-radius: 1.8rem;
@@ -544,7 +542,6 @@
             padding: 0 0.3rem;
         }
 
-        /* ---------- RECEIVE VIEW ---------- */
         .receive-hero {
             flex: 1;
             display: flex;
@@ -686,7 +683,6 @@
             margin-bottom: 0.3rem;
         }
 
-        /* Responsive */
         @media (max-width: 700px) {
             .app-container { padding: 1.5rem; }
             .status-panel { border-radius: 1.5rem; padding: 1rem 1.2rem; }
@@ -712,7 +708,6 @@
         </div>
     </div>
 
-    <!-- MODE SELECTOR -->
     <div class="mode-selector">
         <button id="modeSendBtn" class="mode-btn active" data-mode="send">
             <span class="mode-icon">📤</span> Send files
@@ -722,64 +717,50 @@
         </button>
     </div>
 
-    <!-- STATUS -->
     <div class="status-panel">
         <div class="peer-status">
             <div id="connectionDot" class="dot waiting"></div>
             <span id="peerStatusText">Waiting for peer…</span>
         </div>
         <div id="pairIdDisplay" class="pair-id">
-            <strong>ROOM:</strong> <span id="roomCode">— — —</span>
+            <strong>PEER:</strong> <span id="roomCode">connecting…</span>
         </div>
         <div class="action-buttons">
-            <button id="newRoomBtn" class="btn btn-outline" title="Generate new room">↻ New room</button>
-            <button id="copyRoomBtn" class="btn" title="Copy room code">📋 Copy</button>
             <button id="togglePairingBtn" class="btn" title="Show/hide pairing panel">🔗 Pair</button>
         </div>
     </div>
 
-    <!-- SIGNALING PANEL -->
-    <div id="signalingPanel" class="signaling-panel" style="display:none;">
+    <div id="pairingPanel" class="signaling-panel" style="display:none;">
         <div style="font-weight:500; color:var(--text-secondary); margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
-            <span>🔗 Manual pairing (copy-paste between laptops)</span>
-            <button id="closeSignalPanel" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
+            <span>🔗 Pair with the other laptop</span>
+            <button id="closePairingPanel" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
         </div>
+
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
             <div>
-                <label class="signaling-label">A · Your offer (initiator creates)</label>
-                <textarea id="offerTextarea" rows="3" readonly class="textarea" placeholder="Click 'Create offer' →"></textarea>
-                <div style="display:flex; gap:0.5rem; margin-top:0.4rem;">
-                    <button id="createOfferBtn" class="btn" style="font-size:0.78rem; padding:0.4rem 0.9rem;">Create offer</button>
-                    <button id="copyOfferBtn" class="btn" style="font-size:0.78rem; padding:0.4rem 0.9rem;">Copy</button>
+                <label class="signaling-label">Your peer ID (share this)</label>
+                <div style="display:flex; gap:0.5rem;">
+                    <input id="myPeerId" readonly class="textarea" style="flex:1; padding:0.7rem; font-size:0.85rem;" value="connecting…">
+                    <button id="copyPeerIdBtn" class="btn" style="padding:0.5rem 1rem;">Copy</button>
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem;">
+                    Tell the other laptop this ID so they can connect to you.
                 </div>
             </div>
             <div>
-                <label class="signaling-label">B · Paste offer, then create answer</label>
-                <textarea id="incomingOfferTextarea" rows="2" class="textarea" placeholder="Paste offer here..."></textarea>
-                <div style="display:flex; gap:0.5rem; margin-top:0.4rem;">
-                    <button id="createAnswerBtn" class="btn" style="font-size:0.78rem; padding:0.4rem 0.9rem;">Create answer</button>
+                <label class="signaling-label">Connect to a peer</label>
+                <div style="display:flex; gap:0.5rem;">
+                    <input id="remotePeerId" class="textarea" style="flex:1; padding:0.7rem; font-size:0.85rem;" placeholder="Paste their ID here…">
+                    <button id="connectPeerBtn" class="btn btn-primary" style="padding:0.5rem 1rem;">Connect</button>
                 </div>
-            </div>
-            <div>
-                <label class="signaling-label">C · Your answer (copy back)</label>
-                <textarea id="answerTextarea" rows="3" readonly class="textarea" placeholder="Answer appears here →"></textarea>
-                <div style="display:flex; gap:0.5rem; margin-top:0.4rem;">
-                    <button id="copyAnswerBtn" class="btn" style="font-size:0.78rem; padding:0.4rem 0.9rem;">Copy</button>
-                </div>
-            </div>
-            <div>
-                <label class="signaling-label">D · Paste answer to complete</label>
-                <textarea id="incomingAnswerTextarea" rows="2" class="textarea" placeholder="Paste answer here..."></textarea>
-                <div style="display:flex; gap:0.5rem; margin-top:0.4rem;">
-                    <button id="acceptAnswerBtn" class="btn" style="font-size:0.78rem; padding:0.4rem 0.9rem;">Accept answer</button>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem;">
+                    Only one laptop needs to click Connect — the other will auto-accept.
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MAIN AREA (toggles between send & receive) -->
     <div class="main-area">
-        <!-- SEND VIEW -->
         <div id="sendView" class="card">
             <div class="card-title">
                 <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -818,7 +799,6 @@
             </button>
         </div>
 
-        <!-- RECEIVE VIEW -->
         <div id="receiveView" class="card hidden">
             <div class="card-title receive-title">
                 <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM9 8h6v2H9zm0 4h6v2H9z"/></svg>
@@ -862,6 +842,7 @@
     </div>
 </div>
 
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 (function() {
     const CHUNK_SIZE = 16384;
@@ -912,8 +893,6 @@
     const roomCodeEl = document.getElementById('roomCode');
     const connectionDot = document.getElementById('connectionDot');
     const peerStatusText = document.getElementById('peerStatusText');
-    const newRoomBtn = document.getElementById('newRoomBtn');
-    const copyRoomBtn = document.getElementById('copyRoomBtn');
     const togglePairingBtn = document.getElementById('togglePairingBtn');
 
     const dropzone = document.getElementById('dropzone');
@@ -937,18 +916,19 @@
     const incomingCountEl = document.getElementById('incomingCount');
     const incomingBytesEl = document.getElementById('incomingBytes');
 
-    const signalingPanel = document.getElementById('signalingPanel');
-    const offerTextarea = document.getElementById('offerTextarea');
-    const incomingOfferTextarea = document.getElementById('incomingOfferTextarea');
-    const answerTextarea = document.getElementById('answerTextarea');
-    const incomingAnswerTextarea = document.getElementById('incomingAnswerTextarea');
+    const pairingPanel = document.getElementById('pairingPanel');
+    const myPeerIdEl = document.getElementById('myPeerId');
+    const remotePeerIdEl = document.getElementById('remotePeerId');
+    const connectPeerBtn = document.getElementById('connectPeerBtn');
+    const copyPeerIdBtn = document.getElementById('copyPeerIdBtn');
 
     // ---------- STATE ----------
-    let peerConnection = null;
+    let peer = null;
     let dataChannel = null;
+    let activeConnection = null;
     let pendingFiles = [];
     let isConnected = false;
-    let roomId = null;
+    let myPeerId = null;
 
     let sendingFiles = [];
     let currentFileIndex = 0;
@@ -978,24 +958,6 @@
         return (bytes / 1073741824).toFixed(2) + ' GB';
     }
 
-    function generateRoomId() {
-        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-        let r = '';
-        for (let i = 0; i < 6; i++) r += chars.charAt(Math.floor(Math.random() * chars.length));
-        return r;
-    }
-
-    function setRoomId(id) {
-        roomId = id;
-        roomCodeEl.textContent = id;
-        window.location.hash = id;
-    }
-
-    function readRoomFromHash() {
-        const h = window.location.hash.slice(1).trim();
-        return /^[A-Z0-9]{6}$/.test(h) ? h : null;
-    }
-
     function updateConnectionStatus(state) {
         connectionDot.className = 'dot';
         if (state === 'connected') {
@@ -1017,69 +979,69 @@
         sendBtn.disabled = pendingFiles.length === 0 || !isConnected || isSending;
     }
 
-    function resetPeerConnection() {
-        if (peerConnection) { try { peerConnection.close(); } catch (e) {} peerConnection = null; }
-        if (dataChannel) { try { dataChannel.close(); } catch (e) {} dataChannel = null; }
-        isSending = false;
-        sendingFiles = [];
-        currentFileIndex = 0;
-        currentFile = null;
-        currentFileOffset = 0;
-        receivingFile = null;
-        updateConnectionStatus('waiting');
-        hideSendProgress();
-        hideReceiveProgress();
+    // ---------- PEERJS SETUP ----------
+    function makePeerId() {
+        const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+        let id = 'localdrop-';
+        for (let i = 0; i < 8; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
+        return id;
     }
 
-    // ---------- PEER CONNECTION ----------
-    async function createPeerConnection(isInitiator) {
-        resetPeerConnection();
-        peerConnection = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-
-        if (isInitiator) {
-            dataChannel = peerConnection.createDataChannel('fileTransfer');
-            setupDataChannel(dataChannel);
-        } else {
-            peerConnection.ondatachannel = (e) => {
-                dataChannel = e.channel;
-                setupDataChannel(dataChannel);
-            };
+    function initPeer() {
+        let storedId = localStorage.getItem('localdrop-peer-id');
+        if (!storedId) {
+            storedId = makePeerId();
+            localStorage.setItem('localdrop-peer-id', storedId);
         }
 
-        peerConnection.onicecandidate = (e) => {
-            if (e.candidate && offerTextarea && peerConnection.localDescription) {
-                setTimeout(() => {
-                    if (peerConnection && peerConnection.localDescription) {
-                        offerTextarea.value = JSON.stringify(peerConnection.localDescription);
-                    }
-                }, 100);
+        peer = new Peer(storedId, {
+            config: { iceServers: ICE_SERVERS },
+            debug: 1
+        });
+
+        peer.on('open', (id) => {
+            myPeerId = id;
+            myPeerIdEl.value = id;
+            roomCodeEl.textContent = id;
+            log('Peer ready · ID: ' + id);
+            updateConnectionStatus('waiting');
+        });
+
+        peer.on('error', (err) => {
+            log('Peer error: ' + err.type);
+            if (err.type === 'unavailable-id') {
+                const fresh = makePeerId();
+                localStorage.setItem('localdrop-peer-id', fresh);
+                try { peer.destroy(); } catch (e) {}
+                setTimeout(initPeer, 500);
             }
-        };
+        });
 
-        peerConnection.onicegatheringstatechange = () => {
-            if (peerConnection.iceGatheringState === 'complete' && offerTextarea && peerConnection.localDescription) {
-                offerTextarea.value = JSON.stringify(peerConnection.localDescription);
+        peer.on('connection', (conn) => {
+            if (activeConnection) {
+                try { activeConnection.close(); } catch (e) {}
             }
-        };
+            activeConnection = conn;
+            setupPeerConnection(conn);
+            log('Incoming connection from ' + conn.peer);
+        });
 
-        peerConnection.onconnectionstatechange = () => {
-            const s = peerConnection.connectionState;
-            if (s === 'connected') { updateConnectionStatus('connected'); log('Peer connected'); }
-            else if (s === 'disconnected' || s === 'failed') { updateConnectionStatus('waiting'); log('Peer disconnected'); }
-            else if (s === 'connecting') updateConnectionStatus('connecting');
-        };
-
-        return peerConnection;
+        peer.on('disconnected', () => {
+            log('Peer server disconnected — reconnecting…');
+            updateConnectionStatus('waiting');
+            try { peer.reconnect(); } catch (e) {}
+        });
     }
 
-    function setupDataChannel(channel) {
-        channel.binaryType = 'arraybuffer';
-        channel.onopen = () => { updateConnectionStatus('connected'); log('Data channel open'); };
-        channel.onclose = () => { updateConnectionStatus('waiting'); log('Data channel closed'); };
-        channel.onerror = (err) => log('Channel error: ' + err.message);
+    function setupPeerConnection(conn) {
+        conn.on('open', () => {
+            dataChannel = conn;
+            isConnected = true;
+            updateConnectionStatus('connected');
+            log('Peer connected · ready to transfer');
+        });
 
-        channel.onmessage = (event) => {
-            const data = event.data;
+        conn.on('data', (data) => {
             if (typeof data === 'string') {
                 try {
                     const msg = JSON.parse(data);
@@ -1087,41 +1049,72 @@
                         receivingFile = { name: msg.name, path: msg.path || msg.name, size: msg.size, chunks: [] };
                         showReceiveProgress(0, msg.path || msg.name, msg.size);
                         log(`Receiving: ${msg.path || msg.name} (${formatSize(msg.size)})`);
-                    } else if (msg.type === 'file-end') {
-                        if (receivingFile) {
-                            const blob = new Blob(receivingFile.chunks);
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = receivingFile.path || receivingFile.name;
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            setTimeout(() => URL.revokeObjectURL(url), 5000);
-                            receivedFileCount++;
-                            receivedBytesTotal += receivingFile.size;
-                            incomingCountEl.textContent = receivedFileCount;
-                            incomingBytesEl.textContent = formatSize(receivedBytesTotal);
-                            log(`Received: ${receivingFile.path || receivingFile.name}`);
-                            receivingFile = null;
-                            hideReceiveProgress();
-                        }
+                    } else if (msg.type === 'file-end' && receivingFile) {
+                        const blob = new Blob(receivingFile.chunks);
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = receivingFile.path || receivingFile.name;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        setTimeout(() => URL.revokeObjectURL(url), 5000);
+                        receivedFileCount++;
+                        receivedBytesTotal += receivingFile.size;
+                        incomingCountEl.textContent = receivedFileCount;
+                        incomingBytesEl.textContent = formatSize(receivedBytesTotal);
+                        log(`Received: ${receivingFile.path || receivingFile.name}`);
+                        receivingFile = null;
+                        hideReceiveProgress();
                     }
                 } catch (e) {}
-            } else {
-                if (receivingFile) {
-                    receivingFile.chunks.push(data);
-                    const received = receivingFile.chunks.reduce((a, c) => a + c.byteLength, 0);
-                    const pct = Math.min(100, Math.floor((received / receivingFile.size) * 100));
-                    showReceiveProgress(pct, receivingFile.path || receivingFile.name, receivingFile.size);
-                }
+            } else if (receivingFile) {
+                receivingFile.chunks.push(data);
+                const received = receivingFile.chunks.reduce((a, c) => a + c.byteLength, 0);
+                const pct = Math.min(100, Math.floor((received / receivingFile.size) * 100));
+                showReceiveProgress(pct, receivingFile.path || receivingFile.name, receivingFile.size);
             }
-        };
+        });
+
+        conn.on('close', () => {
+            isConnected = false;
+            dataChannel = null;
+            updateConnectionStatus('waiting');
+            log('Peer disconnected');
+        });
+
+        conn.on('error', (err) => log('Connection error: ' + err));
     }
 
-    // ---------- SEND ----------
+    // ---------- PAIRING UI EVENTS ----------
+    togglePairingBtn.addEventListener('click', () => {
+        pairingPanel.style.display = pairingPanel.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.getElementById('closePairingPanel').addEventListener('click', () => {
+        pairingPanel.style.display = 'none';
+    });
+
+    copyPeerIdBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(myPeerIdEl.value)
+            .then(() => log('Peer ID copied'))
+            .catch(() => log('Copy failed'));
+    });
+
+    connectPeerBtn.addEventListener('click', () => {
+        const remoteId = remotePeerIdEl.value.trim();
+        if (!remoteId) { log('Enter a peer ID first'); return; }
+        if (remoteId === myPeerIdEl.value) { log('That\'s your own ID'); return; }
+
+        log('Connecting to ' + remoteId + '…');
+        const conn = peer.connect(remoteId, { reliable: true });
+        activeConnection = conn;
+        setupPeerConnection(conn);
+    });
+
+    // ---------- SEND LOGIC ----------
     function startSending() {
-        if (!dataChannel || dataChannel.readyState !== 'open') { log('Peer not connected'); return; }
+        if (!dataChannel || !dataChannel.open) { log('Peer not connected'); return; }
         if (pendingFiles.length === 0 || isSending) return;
         sendingFiles = pendingFiles.slice();
         currentFileIndex = 0;
@@ -1160,7 +1153,7 @@
         const slice = currentFile.slice(currentFileOffset, currentFileOffset + CHUNK_SIZE);
         const reader = new FileReader();
         reader.onload = (e) => {
-            if (!dataChannel || dataChannel.readyState !== 'open') {
+            if (!dataChannel || !dataChannel.open) {
                 log('Connection lost during send');
                 isSending = false;
                 sendBtn.disabled = false;
@@ -1310,88 +1303,12 @@
 
     sendBtn.addEventListener('click', startSending);
 
-    // ---------- ROOM ----------
-    function initRoom() {
-        const hash = readRoomFromHash();
-        setRoomId(hash || generateRoomId());
-        updateConnectionStatus('waiting');
-        resetPeerConnection();
-        log('Room: ' + roomId);
-    }
-
-    newRoomBtn.addEventListener('click', () => {
-        setRoomId(generateRoomId());
-        resetPeerConnection();
-        log('New room: ' + roomId);
-    });
-
-    copyRoomBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(roomId).then(() => log('Room code copied')).catch(() => log('Copy failed'));
-    });
-
-    togglePairingBtn.addEventListener('click', () => {
-        signalingPanel.style.display = signalingPanel.style.display === 'none' ? 'block' : 'none';
-    });
-
-    // ---------- SIGNALING ----------
-    document.getElementById('closeSignalPanel').addEventListener('click', () => {
-        signalingPanel.style.display = 'none';
-    });
-
-    document.getElementById('createOfferBtn').addEventListener('click', async () => {
-        await createPeerConnection(true);
-        try {
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
-            offerTextarea.value = JSON.stringify(peerConnection.localDescription);
-            setTimeout(() => {
-                if (peerConnection?.localDescription) offerTextarea.value = JSON.stringify(peerConnection.localDescription);
-            }, 800);
-        } catch (e) { log('Offer error: ' + e.message); }
-    });
-
-    document.getElementById('copyOfferBtn').addEventListener('click', () => {
-        offerTextarea.select();
-        document.execCommand('copy');
-        log('Offer copied');
-    });
-
-    document.getElementById('createAnswerBtn').addEventListener('click', async () => {
-        const offerStr = incomingOfferTextarea.value.trim();
-        if (!offerStr) { log('Paste an offer first'); return; }
-        try {
-            const offer = JSON.parse(offerStr);
-            await createPeerConnection(false);
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-            const answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
-            setTimeout(() => {
-                if (peerConnection?.localDescription) answerTextarea.value = JSON.stringify(peerConnection.localDescription);
-            }, 800);
-        } catch (e) { log('Answer error: ' + e.message); }
-    });
-
-    document.getElementById('copyAnswerBtn').addEventListener('click', () => {
-        answerTextarea.select();
-        document.execCommand('copy');
-        log('Answer copied');
-    });
-
-    document.getElementById('acceptAnswerBtn').addEventListener('click', async () => {
-        const ansStr = incomingAnswerTextarea.value.trim();
-        if (!ansStr) { log('Paste an answer first'); return; }
-        try {
-            const answer = JSON.parse(ansStr);
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-            log('Answer accepted, connecting…');
-        } catch (e) { log('Invalid answer: ' + e.message); }
-    });
-
     // ---------- INIT ----------
     setMode(currentMode);
-    initRoom();
+    initPeer();
     updateConnectionStatus('waiting');
     renderFileList();
+    log('Ready · click 🔗 Pair to connect');
 })();
 </script>
 </body>
