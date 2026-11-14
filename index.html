@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalDrop · browser-to-browser migration</title>
+    <style>
+        :root {
+            --bg-grad-start: #0b1a2e;
+            --bg-grad-end: #1a2f3f;
+            --panel-bg: rgba(18, 30, 41, 0.75);
+            --panel-border: rgba(255, 255, 255, 0.06);
+            --card-bg: rgba(12, 22, 32, 0.65);
+            --card-border: rgba(255, 255, 255, 0.04);
+            --text-primary: #f0f9ff;
+            --text-secondary: #b0c8da;
+            --text-muted: #6f8b9c;
+            --text-faint: #3f5b6b;
+            --accent: #2dd4bf;
+            --accent-hover: #5eead4;
+            --accent-glow: rgba(45, 212, 191, 0.3);
+            --accent-soft: rgba(45, 212, 191, 0.12);
+            --accent-border: rgba(45, 212, 191, 0.25);
+            --status-bg: rgba(0, 0, 0, 0.25);
+            --status-border: rgba(255, 255, 255, 0.04);
+            --btn-bg: rgba(255, 255, 255, 0.05);
+            --btn-border: rgba(255, 255, 255, 0.08);
+            --btn-hover-bg: rgba(255, 255, 255, 0.12);
+            --dropzone-border: rgba(45, 212, 191, 0.25);
+            --dropzone-bg: rgba(45, 212, 191, 0.02);
+            --dropzone-hover-bg: rgba(45, 212, 191, 0.08);
+            --file-item-bg: rgba(255, 255, 255, 0.03);
+            --file-item-border: rgba(255, 255, 255, 0.03);
+            --progress-bg: rgba(0, 0, 0, 0.2);
+            --progress-bar-bg: rgba(255, 255, 255, 0.06);
+            --log-time: #4a6373;
+            --input-bg: #0b1a2e;
+            --input-border: #1e3a4a;
+            --shadow-color: rgba(0, 0, 0, 0.6);
+            --inset-highlight: rgba(255, 255, 255, 0.08);
+            --inset-soft: rgba(255, 255, 255, 0.02);
+        }
+
+        body.light {
+            --bg-grad-start: #e0f2f1;
+            --bg-grad-end: #b2dfdb;
+            --panel-bg: rgba(255, 255, 255, 0.85);
+            --panel-border: rgba(0, 0, 0, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --text-primary: #0b1a2e;
+            --text-secondary: #2a4a5e;
+            --text-muted: #5a7a8e;
+            --text-faint: #8aa4b4;
+            --accent: #0d9488;
+            --accent-hover: #14b8a6;
+            --accent-glow: rgba(13, 148, 136, 0.25);
+            --accent-soft: rgba(13, 148, 136, 0.1);
+            --accent-border: rgba(13, 148, 136, 0.3);
+            --status-bg: rgba(255, 255, 255, 0.6);
+            --status-border: rgba(0, 0, 0, 0.06);
+            --btn-bg: rgba(0, 0, 0, 0.04);
+            --btn-border: rgba(0, 0, 0, 0.1);
+            --btn-hover-bg: rgba(0, 0, 0, 0.08);
+            --dropzone-border: rgba(13, 148, 136, 0.35);
+            --dropzone-bg: rgba(13, 148, 136, 0.04);
+            --dropzone-hover-bg: rgba(13, 148, 136, 0.1);
+            --file-item-bg: rgba(0, 0, 0, 0.03);
+            --file-item-border: rgba(0, 0, 0, 0.05);
+            --progress-bg: rgba(0, 0, 0, 0.06);
+            --progress-bar-bg: rgba(0, 0, 0, 0.08);
+            --log-time: #6a8a9e;
+            --input-bg: #f8fdfc;
+            --input-border: #a8d5cf;
+            --shadow-color: rgba(0, 0, 0, 0.12);
+            --inset-highlight: rgba(255, 255, 255, 0.9);
+            --inset-soft: rgba(0, 0, 0, 0.02);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Inter', 'Segoe UI', Roboto, sans-serif;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .app-container {
+            max-width: 1100px;
+            width: 100%;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 2.5rem;
+            padding: 2rem 2rem 2.2rem;
+            box-shadow: 0 25px 50px -8px var(--shadow-color), inset 0 1px 1px var(--inset-highlight);
+            border: 1px solid var(--panel-border);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            background: var(--accent);
+            width: 44px;
+            height: 44px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px -4px var(--accent-glow);
+        }
+
+        .logo-icon svg {
+            width: 26px;
+            height: 26px;
+            fill: var(--bg-grad-start);
+        }
+
+        body.light .logo-icon svg { fill: #fff; }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .logo-text span { color: var(--accent); font-weight: 700; }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .badge {
+            background: var(--accent-soft);
+            padding: 0.5rem 1.1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--accent);
+            border: 1px solid var(--accent-border);
+            letter-spacing: 0.3px;
+        }
+
+        .theme-toggle {
+            background: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--btn-hover-bg);
+            border-color: var(--accent-border);
+            transform: rotate(15deg);
+        }
+
+        .status-panel {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--status-bg);
+            border-radius: 80px;
+            padding: 0.6rem 1.5rem 0.6rem 1.8rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--status-border);
+            gap: 1rem;
+        }
+
+        .peer-status {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 450;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+
+        .dot.connected {
+            background: var(--accent);
+            box-shadow: 0 0 12px var(--accent);
+        }
+
+        .dot.waiting {
+            background: #fbbf24;
+            box-shadow: 0 0 10px #fbbf24;
+        }
+
+        .pair-id {
+            font-family: 'SF Mono', 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            background: var(--btn-bg);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            border: 1px solid var(--btn-border);
+            word-break: break-all;
+        }
+
+        .pair-id strong { color: var(--accent); font-weight: 600; }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .btn {
+            background: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            color: var(--text-primary);
+            padding: 0.7rem 1.4rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--btn-hover-bg);
+            border-color: var(--accent-border);
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            filter: grayscale(0.5);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 6px 14px -4px var(--accent-glow);
+        }
+
+        body.light .btn-primary { color: #fff; }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+            color: #0b1a2e;
+        }
+
+        body.light .btn-primary:hover:not(:disabled) { color: #fff; }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent-border);
+            color: var(--accent);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 700px) {
+            .main-grid { grid-template-columns: 1fr; gap: 1.2rem; }
+            .app-container { padding: 1.5rem; }
+            .status-panel { border-radius: 1.5rem; padding: 1rem 1.2rem; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 2rem;
+            padding: 1.6rem 1.6rem 1.8rem;
+            border: 1px solid var(--card-border);
+            box-shadow: inset 0 1px 0 var(--inset-soft);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.75rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .card-title svg { width: 18px; height: 18px; fill: var(--accent); opacity: 0.9; }
+
+        .dropzone {
+            border: 2px dashed var(--dropzone-border);
+            border-radius: 1.8rem;
+            padding: 1.8rem 1rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            background: var(--dropzone-bg);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.9rem;
+        }
+
+        .dropzone.dragover {
+            border-color: var(--accent);
+            background: var(--dropzone-hover-bg);
+            box-shadow: 0 0 20px var(--accent-soft);
+        }
+
+        .drop-icon { font-size: 2.2rem; opacity: 0.9; }
+
+        .drop-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .drop-text strong { color: var(--accent); font-weight: 600; }
+
+        .drop-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.4rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .drop-actions .btn {
+            padding: 0.5rem 1.1rem;
+            font-size: 0.82rem;
+        }
+
+        .file-input { display: none; }
+
+        .file-list {
+            margin-top: 1.2rem;
+            max-height: 180px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding-right: 4px;
+        }
+
+        .file-list::-webkit-scrollbar { width: 4px; }
+        .file-list::-webkit-scrollbar-thumb {
+            background: var(--accent-border);
+            border-radius: 10px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--file-item-bg);
+            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--file-item-border);
+            gap: 0.6rem;
+        }
+
+        .file-icon { flex-shrink: 0; font-size: 1rem; }
+
+        .file-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        .file-path {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            display: block;
+            opacity: 0.8;
+        }
+
+        .file-size {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 400;
+            flex-shrink: 0;
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+            padding: 0 0.2rem;
+        }
+
+        .remove-file:hover { color: #f87171; }
+
+        .progress-area {
+            margin-top: 1.2rem;
+            background: var(--progress-bg);
+            border-radius: 40px;
+            padding: 0.6rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            border: 1px solid var(--btn-border);
+        }
+
+        .progress-bar-bg {
+            flex: 1;
+            height: 6px;
+            background: var(--progress-bar-bg);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 20px;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .transfer-log {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            max-height: 90px;
+            overflow-y: auto;
+            border-top: 1px solid var(--btn-border);
+            padding-top: 0.8rem;
+        }
+
+        .log-entry {
+            padding: 0.15rem 0;
+            display: flex;
+            gap: 0.5rem;
+            align-items: baseline;
+        }
+
+        .log-time {
+            color: var(--log-time);
+            font-family: monospace;
+            font-size: 0.7rem;
+        }
+
+        .send-btn {
+            margin-top: 1.4rem;
+            width: 100%;
+            justify-content: center;
+            padding: 0.9rem;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 1.8rem;
+            font-size: 0.75rem;
+            color: var(--text-faint);
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .footer-note span {
+            background: var(--btn-bg);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            border: 1px solid var(--btn-border);
+        }
+
+        .hidden { display: none !important; }
+
+        .connected-badge { color: var(--accent); font-weight: 500; }
+
+        .queue-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.7rem;
+            padding: 0 0.3rem;
+        }
+
+        .signaling-panel {
+            margin-top: 1.5rem;
+            padding: 1.2rem 1.5rem;
+            background: var(--status-bg);
+            border-radius: 2rem;
+            border: 1px solid var(--accent-border);
+        }
+
+        .signaling-panel .textarea {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 1rem;
+            padding: 0.8rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+            font-size: 0.75rem;
+            resize: vertical;
+        }
+
+        .signaling-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                </svg>
+            </div>
+            <div class="logo-text">Local<span>Drop</span></div>
+        </div>
+        <div class="header-right">
+            <div class="badge">browser-to-browser · no cloud</div>
+            <button id="themeToggle" class="theme-toggle" title="Toggle theme">🌙</button>
+        </div>
+    </div>
+
+    <div class="status-panel">
+        <div class="peer-status">
+            <div id="connectionDot" class="dot waiting"></div>
+            <span id="peerStatusText">Waiting for peer…</span>
+        </div>
+        <div id="pairIdDisplay" class="pair-id">
+            <strong>ROOM:</strong> <span id="roomCode">— — —</span>
+        </div>
+        <div class="action-buttons">
+            <button id="newRoomBtn" class="btn btn-outline" title="Generate new room">↻ New room</button>
+            <button id="copyRoomBtn" class="btn" title="Copy room code">📋 Copy</button>
+        </div>
+    </div>
+
+    <div id="signalingPanel" class="signaling-panel" style="display:none;">
+        <div style="font-weight:500; color:var(--text-secondary); margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+            <span>🔗 Manual pairing (copy-paste)</span>
+            <button id="closeSignalPanel" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div>
+                <label class="signaling-label">1. Your offer (copy to other laptop)</label>
+                <textarea id="offerTextarea" rows="3" readonly class="textarea" placeholder="Offer will appear here..."></textarea>
+                <div style="display:flex; gap:0.6rem; margin-top:0.4rem;">
+                    <button id="createOfferBtn" class="btn" style="font-size:0.8rem; padding:0.4rem 1rem;">Create offer</button>
+                    <button id="copyOfferBtn" class="btn" style="font-size:0.8rem; padding:0.4rem 1rem;">Copy offer</button>
+                </div>
+            </div>
+            <div>
+                <label class="signaling-label">2. Paste offer from other laptop (non-initiator)</label>
+                <textarea id="incomingOfferTextarea" rows="2" class="textarea" placeholder="Paste offer here..."></textarea>
+                <div style="display:flex; gap:0.6rem; margin-top:0.4rem;">
+                    <button id="createAnswerBtn" class="btn" style="font-size:0.8rem; padding:0.4rem 1rem;">Create answer</button>
+                </div>
+            </div>
+            <div>
+                <label class="signaling-label">3. Your answer (copy back to initiator)</label>
+                <textarea id="answerTextarea" rows="3" readonly class="textarea" placeholder="Answer will appear here..."></textarea>
+                <div style="display:flex; gap:0.6rem; margin-top:0.4rem;">
+                    <button id="copyAnswerBtn" class="btn" style="font-size:0.8rem; padding:0.4rem 1rem;">Copy answer</button>
+                </div>
+            </div>
+            <div>
+                <label class="signaling-label">4. Paste answer from other laptop (initiator)</label>
+                <textarea id="incomingAnswerTextarea" rows="2" class="textarea" placeholder="Paste answer here..."></textarea>
+                <div style="display:flex; gap:0.6rem; margin-top:0.4rem;">
+                    <button id="acceptAnswerBtn" class="btn" style="font-size:0.8rem; padding:0.4rem 1rem;">Accept answer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <div class="card">
+            <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                send files & folders
+            </div>
+
+            <div id="dropzone" class="dropzone">
+                <div class="drop-icon">📂</div>
+                <div class="drop-text">
+                    <strong>Drop files or folders</strong><br>
+                    or click below to browse · stays on device
+                </div>
+                <div class="drop-actions">
+                    <button id="pickFilesBtn" class="btn">📄 Pick files</button>
+                    <button id="pickFolderBtn" class="btn">📁 Pick folder</button>
+                </div>
+                <input type="file" id="fileInput" class="file-input" multiple>
+                <input type="file" id="folderInput" class="file-input" webkitdirectory directory multiple>
+            </div>
+
+            <div id="fileList" class="file-list"></div>
+            <div class="queue-stats">
+                <span id="queueCount">0 items</span>
+                <span id="queueSize">0 B</span>
+            </div>
+
+            <div id="sendProgressContainer" class="progress-area hidden">
+                <span id="sendProgressLabel">0%</span>
+                <div class="progress-bar-bg">
+                    <div id="sendProgressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <button id="sendBtn" class="btn btn-primary send-btn" disabled>
+                ⚡ Send files
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM9 8h6v2H9zm0 4h6v2H9z"/></svg>
+                receive files
+            </div>
+
+            <div id="receiveProgressContainer" class="progress-area">
+                <span id="receiveProgressLabel">idle</span>
+                <div class="progress-bar-bg">
+                    <div id="receiveProgressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div id="transferLog" class="transfer-log">
+                <div class="log-entry"><span class="log-time">--:--</span> Waiting for incoming files…</div>
+            </div>
+
+            <div style="margin-top: 0.8rem; font-size: 0.8rem; color: var(--text-muted); padding-left: 0.2rem;">
+                <span id="incomingCount">0</span> file(s) received
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <span>direct P2P</span>
+        <span>no upload</span>
+        <span>WebRTC</span>
+    </div>
+</div>
+
+<script>
+(function() {
+    const CHUNK_SIZE = 16384;
+    const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }];
+
+    // ---------- THEME ----------
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('localdrop-theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light');
+        themeToggle.textContent = '☀️';
+    }
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light');
+        const isLight = document.body.classList.contains('light');
+        themeToggle.textContent = isLight ? '☀️' : '🌙';
+        localStorage.setItem('localdrop-theme', isLight ? 'light' : 'dark');
+    });
+
+    // ---------- DOM ----------
+    const roomCodeEl = document.getElementById('roomCode');
+    const connectionDot = document.getElementById('connectionDot');
+    const peerStatusText = document.getElementById('peerStatusText');
+    const newRoomBtn = document.getElementById('newRoomBtn');
+    const copyRoomBtn = document.getElementById('copyRoomBtn');
+
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const folderInput = document.getElementById('folderInput');
+    const pickFilesBtn = document.getElementById('pickFilesBtn');
+    const pickFolderBtn = document.getElementById('pickFolderBtn');
+    const fileListEl = document.getElementById('fileList');
+    const queueCountEl = document.getElementById('queueCount');
+    const queueSizeEl = document.getElementById('queueSize');
+    const sendBtn = document.getElementById('sendBtn');
+
+    const sendProgressContainer = document.getElementById('sendProgressContainer');
+    const sendProgressLabel = document.getElementById('sendProgressLabel');
+    const sendProgressFill = document.getElementById('sendProgressFill');
+
+    const receiveProgressContainer = document.getElementById('receiveProgressContainer');
+    const receiveProgressLabel = document.getElementById('receiveProgressLabel');
+    const receiveProgressFill = document.getElementById('receiveProgressFill');
+    const transferLog = document.getElementById('transferLog');
+    const incomingCountEl = document.getElementById('incomingCount');
+
+    const signalingPanel = document.getElementById('signalingPanel');
+    const offerTextarea = document.getElementById('offerTextarea');
+    const incomingOfferTextarea = document.getElementById('incomingOfferTextarea');
+    const answerTextarea = document.getElementById('answerTextarea');
+    const incomingAnswerTextarea = document.getElementById('incomingAnswerTextarea');
+
+    // ---------- STATE ----------
+    let peerConnection = null;
+    let dataChannel = null;
+    let pendingFiles = []; // { file, relativePath }
+    let isConnected = false;
+    let roomId = null;
+
+    let sendingFiles = [];
+    let currentFileIndex = 0;
+    let currentFile = null;
+    let currentFileOffset = 0;
+    let currentFileSize = 0;
+    let isSending = false;
+
+    let receivingFile = null;
+    let receivedFileCount = 0;
+
+    // ---------- UTILS ----------
+    function log(msg) {
+        const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `<span class="log-time">${t}</span> ${msg}`;
+        transferLog.prepend(entry);
+        while (transferLog.children.length > 10) transferLog.removeChild(transferLog.lastChild);
+    }
+
+    function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+        return (bytes / 1073741824).toFixed(2) + ' GB';
+    }
+
+    function generateRoomId() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let r = '';
+        for (let i = 0; i < 6; i++) r += chars.charAt(Math.floor(Math.random() * chars.length));
+        return r;
+    }
+
+    function setRoomId(id) {
+        roomId = id;
+        roomCodeEl.textContent = id;
+        window.location.hash = id;
+    }
+
+    function readRoomFromHash() {
+        const h = window.location.hash.slice(1).trim();
+        return /^[A-Z0-9]{6}$/.test(h) ? h : null;
+    }
+
+    function updateConnectionStatus(state) {
+        connectionDot.className = 'dot';
+        if (state === 'connected') {
+            connectionDot.classList.add('connected');
+            peerStatusText.innerHTML = `Connected · <span class="connected-badge">ready</span>`;
+            isConnected = true;
+        } else if (state === 'waiting') {
+            connectionDot.classList.add('waiting');
+            peerStatusText.textContent = 'Waiting for peer…';
+            isConnected = false;
+        } else if (state === 'connecting') {
+            connectionDot.classList.add('waiting');
+            peerStatusText.textContent = 'Connecting to peer…';
+            isConnected = false;
+        } else {
+            peerStatusText.textContent = 'Disconnected';
+            isConnected = false;
+        }
+        sendBtn.disabled = pendingFiles.length === 0 || !isConnected || isSending;
+    }
+
+    function resetPeerConnection() {
+        if (peerConnection) { try { peerConnection.close(); } catch (e) {} peerConnection = null; }
+        if (dataChannel) { try { dataChannel.close(); } catch (e) {} dataChannel = null; }
+        isSending = false;
+        sendingFiles = [];
+        currentFileIndex = 0;
+        currentFile = null;
+        currentFileOffset = 0;
+        receivingFile = null;
+        updateConnectionStatus('waiting');
+        hideSendProgress();
+        hideReceiveProgress();
+    }
+
+    // ---------- PEER CONNECTION ----------
+    async function createPeerConnection(isInitiator) {
+        resetPeerConnection();
+        peerConnection = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+
+        if (isInitiator) {
+            dataChannel = peerConnection.createDataChannel('fileTransfer');
+            setupDataChannel(dataChannel);
+        } else {
+            peerConnection.ondatachannel = (e) => {
+                dataChannel = e.channel;
+                setupDataChannel(dataChannel);
+            };
+        }
+
+        peerConnection.onicecandidate = (e) => {
+            if (e.candidate && offerTextarea && peerConnection.localDescription) {
+                setTimeout(() => {
+                    if (peerConnection && peerConnection.localDescription) {
+                        offerTextarea.value = JSON.stringify(peerConnection.localDescription);
+                    }
+                }, 100);
+            }
+        };
+
+        peerConnection.onicegatheringstatechange = () => {
+            if (peerConnection.iceGatheringState === 'complete' && offerTextarea && peerConnection.localDescription) {
+                offerTextarea.value = JSON.stringify(peerConnection.localDescription);
+            }
+        };
+
+        peerConnection.onconnectionstatechange = () => {
+            const s = peerConnection.connectionState;
+            if (s === 'connected') { updateConnectionStatus('connected'); log('Peer connected'); }
+            else if (s === 'disconnected' || s === 'failed') { updateConnectionStatus('waiting'); log('Peer disconnected'); }
+            else if (s === 'connecting') updateConnectionStatus('connecting');
+        };
+
+        return peerConnection;
+    }
+
+    function setupDataChannel(channel) {
+        channel.binaryType = 'arraybuffer';
+        channel.onopen = () => { updateConnectionStatus('connected'); log('Data channel open'); };
+        channel.onclose = () => { updateConnectionStatus('waiting'); log('Data channel closed'); };
+        channel.onerror = (err) => log('Channel error: ' + err.message);
+
+        channel.onmessage = (event) => {
+            const data = event.data;
+            if (typeof data === 'string') {
+                try {
+                    const msg = JSON.parse(data);
+                    if (msg.type === 'file-start') {
+                        receivingFile = { name: msg.name, path: msg.path || msg.name, size: msg.size, chunks: [] };
+                        showReceiveProgress(0, msg.path || msg.name, msg.size);
+                        log(`Receiving: ${msg.path || msg.name} (${formatSize(msg.size)})`);
+                    } else if (msg.type === 'file-end') {
+                        if (receivingFile) {
+                            const blob = new Blob(receivingFile.chunks);
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = receivingFile.path || receivingFile.name;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            setTimeout(() => URL.revokeObjectURL(url), 5000);
+                            receivedFileCount++;
+                            incomingCountEl.textContent = receivedFileCount;
+                            log(`Received: ${receivingFile.path || receivingFile.name}`);
+                            receivingFile = null;
+                            hideReceiveProgress();
+                        }
+                    }
+                } catch (e) {}
+            } else {
+                if (receivingFile) {
+                    receivingFile.chunks.push(data);
+                    const received = receivingFile.chunks.reduce((a, c) => a + c.byteLength, 0);
+                    const pct = Math.min(100, Math.floor((received / receivingFile.size) * 100));
+                    showReceiveProgress(pct, receivingFile.path || receivingFile.name, receivingFile.size);
+                }
+            }
+        };
+    }
+
+    // ---------- SEND ----------
+    function startSending() {
+        if (!dataChannel || dataChannel.readyState !== 'open') { log('Peer not connected'); return; }
+        if (pendingFiles.length === 0 || isSending) return;
+        sendingFiles = pendingFiles.slice();
+        currentFileIndex = 0;
+        isSending = true;
+        sendBtn.disabled = true;
+        showSendProgress(0, sendingFiles[0]?.file.name || '');
+        sendNextFile();
+    }
+
+    function sendNextFile() {
+        if (currentFileIndex >= sendingFiles.length) {
+            isSending = false;
+            pendingFiles = [];
+            renderFileList();
+            hideSendProgress();
+            sendBtn.disabled = pendingFiles.length === 0 || !isConnected;
+            log('All files sent');
+            return;
+        }
+
+        const entry = sendingFiles[currentFileIndex];
+        currentFile = entry.file;
+        currentFileSize = currentFile.size;
+        currentFileOffset = 0;
+
+        dataChannel.send(JSON.stringify({
+            type: 'file-start',
+            name: currentFile.name,
+            path: entry.path,
+            size: currentFile.size
+        }));
+
+        showSendProgress(0, entry.path, currentFile.size);
+        readAndSendChunk();
+    }
+
+    function readAndSendChunk() {
+        if (!currentFile) return;
+        const slice = currentFile.slice(currentFileOffset, currentFileOffset + CHUNK_SIZE);
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            if (!dataChannel || dataChannel.readyState !== 'open') {
+                log('Connection lost during send');
+                isSending = false;
+                sendBtn.disabled = false;
+                return;
+            }
+            const chunk = e.target.result;
+            dataChannel.send(chunk);
+            currentFileOffset += chunk.byteLength;
+            const pct = Math.min(100, Math.floor((currentFileOffset / currentFileSize) * 100));
+            showSendProgress(pct, sendingFiles[currentFileIndex].path, currentFileSize);
+
+            if (currentFileOffset < currentFileSize) {
+                readAndSendChunk();
+            } else {
+                dataChannel.send(JSON.stringify({ type: 'file-end' }));
+                log(`Sent: ${sendingFiles[currentFileIndex].path}`);
+                currentFileIndex++;
+                currentFile = null;
+                setTimeout(() => sendNextFile(), 150);
+            }
+        };
+
+        reader.onerror = (err) => {
+            log('Read error: ' + err.message);
+            isSending = false;
+            sendBtn.disabled = false;
+        };
+
+        reader.readAsArrayBuffer(slice);
+    }
+
+    // ---------- PROGRESS UI ----------
+    function showSendProgress(pct, name) {
+        sendProgressContainer.classList.remove('hidden');
+        sendProgressFill.style.width = pct + '%';
+        sendProgressLabel.textContent = `${pct}%${name ? ' · ' + name : ''}`;
+    }
+    function hideSendProgress() {
+        sendProgressContainer.classList.add('hidden');
+        sendProgressFill.style.width = '0%';
+    }
+    function showReceiveProgress(pct, name) {
+        receiveProgressContainer.classList.remove('hidden');
+        receiveProgressFill.style.width = pct + '%';
+        receiveProgressLabel.textContent = `${pct}%${name ? ' · ' + name : ''}`;
+    }
+    function hideReceiveProgress() {
+        receiveProgressFill.style.width = '0%';
+        receiveProgressLabel.textContent = 'idle';
+    }
+
+    // ---------- FILE LIST ----------
+    function renderFileList() {
+        fileListEl.innerHTML = '';
+        let totalSize = 0;
+        pendingFiles.forEach((entry, i) => {
+            totalSize += entry.file.size;
+            const item = document.createElement('div');
+            item.className = 'file-item';
+            const icon = entry.path.includes('/') ? '📁' : '📄';
+            const shortPath = entry.path.length > 40 ? '…' + entry.path.slice(-37) : entry.path;
+            item.innerHTML = `
+                <span class="file-icon">${icon}</span>
+                <span class="file-name" title="${entry.path}">${shortPath}</span>
+                <span class="file-size">${formatSize(entry.file.size)}</span>
+                <button class="remove-file" data-index="${i}">&times;</button>
+            `;
+            fileListEl.appendChild(item);
+        });
+
+        document.querySelectorAll('.remove-file').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(e.target.dataset.index, 10);
+                pendingFiles.splice(idx, 1);
+                renderFileList();
+            });
+        });
+
+        queueCountEl.textContent = `${pendingFiles.length} item${pendingFiles.length !== 1 ? 's' : ''}`;
+        queueSizeEl.textContent = formatSize(totalSize);
+        sendBtn.disabled = pendingFiles.length === 0 || !isConnected || isSending;
+    }
+
+    // ---------- ADD FILES ----------
+    function addFiles(fileList) {
+        const newEntries = Array.from(fileList)
+            .filter(f => f.size > 0)
+            .map(f => ({
+                file: f,
+                path: f.webkitRelativePath || f.name
+            }));
+        if (newEntries.length === 0) return;
+        pendingFiles = pendingFiles.concat(newEntries);
+        renderFileList();
+        log(`Added ${newEntries.length} item${newEntries.length !== 1 ? 's' : ''} to queue`);
+    }
+
+    // ---------- DROPZONE EVENTS ----------
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        const items = e.dataTransfer.items;
+        if (items && items.length && items[0].webkitGetAsEntry) {
+            const entries = [];
+            for (let i = 0; i < items.length; i++) {
+                const entry = items[i].webkitGetAsEntry();
+                if (entry) entries.push(entry);
+            }
+            const files = [];
+            for (const entry of entries) {
+                await traverseEntry(entry, '', files);
+            }
+            addFiles(files);
+        } else if (e.dataTransfer.files.length) {
+            addFiles(e.dataTransfer.files);
+        }
+    });
+
+    function traverseEntry(entry, path, out) {
+        return new Promise((resolve) => {
+            if (entry.isFile) {
+                entry.file((file) => {
+                    // Preserve relative path in file's metadata
+                    try { Object.defineProperty(file, 'webkitRelativePath', { value: path + file.name }); } catch (e) {}
+                    out.push(file);
+                    resolve();
+                }, () => resolve());
+            } else if (entry.isDirectory) {
+                const reader = entry.createReader();
+                const readEntries = () => {
+                    reader.readEntries(async (results) => {
+                        if (!results.length) { resolve(); return; }
+                        for (const res of results) {
+                            await traverseEntry(res, path + entry.name + '/', out);
+                        }
+                        readEntries();
+                    }, () => resolve());
+                };
+                readEntries();
+            } else {
+                resolve();
+            }
+        });
+    }
+
+    pickFilesBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
+    pickFolderBtn.addEventListener('click', (e) => { e.stopPropagation(); folderInput.click(); });
+    dropzone.addEventListener('click', (e) => {
+        if (e.target === dropzone || e.target.classList.contains('drop-icon') || e.target.classList.contains('drop-text')) {
+            fileInput.click();
+        }
+    });
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) { addFiles(fileInput.files); fileInput.value = ''; }
+    });
+    folderInput.addEventListener('change', () => {
+        if (folderInput.files.length) { addFiles(folderInput.files); folderInput.value = ''; }
+    });
+
+    sendBtn.addEventListener('click', startSending);
+
+    // ---------- ROOM ----------
+    function initRoom() {
+        const hash = readRoomFromHash();
+        setRoomId(hash || generateRoomId());
+        signalingPanel.style.display = 'block';
+        updateConnectionStatus('waiting');
+        resetPeerConnection();
+        log('Room: ' + roomId);
+    }
+
+    newRoomBtn.addEventListener('click', () => {
+        setRoomId(generateRoomId());
+        signalingPanel.style.display = 'block';
+        resetPeerConnection();
+        log('New room: ' + roomId);
+    });
+
+    copyRoomBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(roomId).then(() => log('Room code copied')).catch(() => log('Copy failed'));
+    });
+
+    // ---------- SIGNALING ----------
+    document.getElementById('closeSignalPanel').addEventListener('click', () => {
+        signalingPanel.style.display = 'none';
+    });
+
+    document.getElementById('createOfferBtn').addEventListener('click', async () => {
+        await createPeerConnection(true);
+        try {
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            offerTextarea.value = JSON.stringify(peerConnection.localDescription);
+            setTimeout(() => {
+                if (peerConnection?.localDescription) offerTextarea.value = JSON.stringify(peerConnection.localDescription);
+            }, 800);
+        } catch (e) { log('Offer error: ' + e.message); }
+    });
+
+    document.getElementById('copyOfferBtn').addEventListener('click', () => {
+        offerTextarea.select();
+        document.execCommand('copy');
+        log('Offer copied');
+    });
+
+    document.getElementById('createAnswerBtn').addEventListener('click', async () => {
+        const offerStr = incomingOfferTextarea.value.trim();
+        if (!offerStr) { log('Paste an offer first'); return; }
+        try {
+            const offer = JSON.parse(offerStr);
+            await createPeerConnection(false);
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            setTimeout(() => {
+                if (peerConnection?.localDescription) answerTextarea.value = JSON.stringify(peerConnection.localDescription);
+            }, 800);
+        } catch (e) { log('Answer error: ' + e.message); }
+    });
+
+    document.getElementById('copyAnswerBtn').addEventListener('click', () => {
+        answerTextarea.select();
+        document.execCommand('copy');
+        log('Answer copied');
+    });
+
+    document.getElementById('acceptAnswerBtn').addEventListener('click', async () => {
+        const ansStr = incomingAnswerTextarea.value.trim();
+        if (!ansStr) { log('Paste an answer first'); return; }
+        try {
+            const answer = JSON.parse(ansStr);
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+            log('Answer accepted, connecting…');
+        } catch (e) { log('Invalid answer: ' + e.message); }
+    });
+
+    // ---------- INIT ----------
+    initRoom();
+    updateConnectionStatus('waiting');
+    renderFileList();
+})();
+</script>
+</body>
+</html>
