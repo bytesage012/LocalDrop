@@ -6,689 +6,129 @@
     <title>LocalDrop · browser-to-browser migration</title>
     <style>
         :root {
-            --bg-grad-start: #0b1a2e;
-            --bg-grad-end: #1a2f3f;
-            --panel-bg: rgba(18, 30, 41, 0.75);
-            --panel-border: rgba(255, 255, 255, 0.06);
-            --card-bg: rgba(12, 22, 32, 0.65);
-            --card-border: rgba(255, 255, 255, 0.04);
-            --text-primary: #f0f9ff;
-            --text-secondary: #b0c8da;
-            --text-muted: #6f8b9c;
-            --text-faint: #3f5b6b;
-            --accent: #2dd4bf;
-            --accent-hover: #5eead4;
-            --accent-glow: rgba(45, 212, 191, 0.3);
-            --accent-soft: rgba(45, 212, 191, 0.12);
-            --accent-border: rgba(45, 212, 191, 0.25);
-            --status-bg: rgba(0, 0, 0, 0.25);
-            --status-border: rgba(255, 255, 255, 0.04);
-            --btn-bg: rgba(255, 255, 255, 0.05);
-            --btn-border: rgba(255, 255, 255, 0.08);
-            --btn-hover-bg: rgba(255, 255, 255, 0.12);
-            --dropzone-border: rgba(45, 212, 191, 0.25);
-            --dropzone-bg: rgba(45, 212, 191, 0.02);
-            --dropzone-hover-bg: rgba(45, 212, 191, 0.08);
-            --file-item-bg: rgba(255, 255, 255, 0.03);
-            --file-item-border: rgba(255, 255, 255, 0.03);
-            --progress-bg: rgba(0, 0, 0, 0.2);
-            --progress-bar-bg: rgba(255, 255, 255, 0.06);
-            --log-time: #4a6373;
-            --input-bg: #0b1a2e;
-            --input-border: #1e3a4a;
-            --shadow-color: rgba(0, 0, 0, 0.6);
-            --inset-highlight: rgba(255, 255, 255, 0.08);
-            --inset-soft: rgba(255, 255, 255, 0.02);
-            --receive-accent: #818cf8;
-            --receive-accent-glow: rgba(129, 140, 248, 0.3);
-            --receive-accent-soft: rgba(129, 140, 248, 0.12);
-            --receive-accent-border: rgba(129, 140, 248, 0.3);
+            --bg-grad-start: #0b1a2e; --bg-grad-end: #1a2f3f;
+            --panel-bg: rgba(18, 30, 41, 0.75); --panel-border: rgba(255, 255, 255, 0.06);
+            --card-bg: rgba(12, 22, 32, 0.65); --card-border: rgba(255, 255, 255, 0.04);
+            --text-primary: #f0f9ff; --text-secondary: #b0c8da; --text-muted: #6f8b9c; --text-faint: #3f5b6b;
+            --accent: #2dd4bf; --accent-hover: #5eead4; --accent-glow: rgba(45, 212, 191, 0.3);
+            --accent-soft: rgba(45, 212, 191, 0.12); --accent-border: rgba(45, 212, 191, 0.25);
+            --status-bg: rgba(0, 0, 0, 0.25); --status-border: rgba(255, 255, 255, 0.04);
+            --btn-bg: rgba(255, 255, 255, 0.05); --btn-border: rgba(255, 255, 255, 0.08); --btn-hover-bg: rgba(255, 255, 255, 0.12);
+            --dropzone-border: rgba(45, 212, 191, 0.25); --dropzone-bg: rgba(45, 212, 191, 0.02); --dropzone-hover-bg: rgba(45, 212, 191, 0.08);
+            --file-item-bg: rgba(255, 255, 255, 0.03); --file-item-border: rgba(255, 255, 255, 0.03);
+            --progress-bg: rgba(0, 0, 0, 0.2); --progress-bar-bg: rgba(255, 255, 255, 0.06);
+            --log-time: #4a6373; --input-bg: #0b1a2e; --input-border: #1e3a4a;
+            --shadow-color: rgba(0, 0, 0, 0.6); --inset-highlight: rgba(255, 255, 255, 0.08); --inset-soft: rgba(255, 255, 255, 0.02);
+            --receive-accent: #818cf8; --receive-accent-glow: rgba(129, 140, 248, 0.3);
+            --receive-accent-soft: rgba(129, 140, 248, 0.12); --receive-accent-border: rgba(129, 140, 248, 0.3);
         }
-
         body.light {
-            --bg-grad-start: #e0f2f1;
-            --bg-grad-end: #b2dfdb;
-            --panel-bg: rgba(255, 255, 255, 0.85);
-            --panel-border: rgba(0, 0, 0, 0.08);
-            --card-bg: rgba(255, 255, 255, 0.8);
-            --card-border: rgba(0, 0, 0, 0.06);
-            --text-primary: #0b1a2e;
-            --text-secondary: #2a4a5e;
-            --text-muted: #5a7a8e;
-            --text-faint: #8aa4b4;
-            --accent: #0d9488;
-            --accent-hover: #14b8a6;
-            --accent-glow: rgba(13, 148, 136, 0.25);
-            --accent-soft: rgba(13, 148, 136, 0.1);
-            --accent-border: rgba(13, 148, 136, 0.3);
-            --status-bg: rgba(255, 255, 255, 0.6);
-            --status-border: rgba(0, 0, 0, 0.06);
-            --btn-bg: rgba(0, 0, 0, 0.04);
-            --btn-border: rgba(0, 0, 0, 0.1);
-            --btn-hover-bg: rgba(0, 0, 0, 0.08);
-            --dropzone-border: rgba(13, 148, 136, 0.35);
-            --dropzone-bg: rgba(13, 148, 136, 0.04);
-            --dropzone-hover-bg: rgba(13, 148, 136, 0.1);
-            --file-item-bg: rgba(0, 0, 0, 0.03);
-            --file-item-border: rgba(0, 0, 0, 0.05);
-            --progress-bg: rgba(0, 0, 0, 0.06);
-            --progress-bar-bg: rgba(0, 0, 0, 0.08);
-            --log-time: #6a8a9e;
-            --input-bg: #f8fdfc;
-            --input-border: #a8d5cf;
-            --shadow-color: rgba(0, 0, 0, 0.12);
-            --inset-highlight: rgba(255, 255, 255, 0.9);
-            --inset-soft: rgba(0, 0, 0, 0.02);
-            --receive-accent: #6366f1;
-            --receive-accent-glow: rgba(99, 102, 241, 0.25);
-            --receive-accent-soft: rgba(99, 102, 241, 0.1);
-            --receive-accent-border: rgba(99, 102, 241, 0.3);
+            --bg-grad-start: #e0f2f1; --bg-grad-end: #b2dfdb;
+            --panel-bg: rgba(255, 255, 255, 0.85); --panel-border: rgba(0, 0, 0, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.8); --card-border: rgba(0, 0, 0, 0.06);
+            --text-primary: #0b1a2e; --text-secondary: #2a4a5e; --text-muted: #5a7a8e; --text-faint: #8aa4b4;
+            --accent: #0d9488; --accent-hover: #14b8a6; --accent-glow: rgba(13, 148, 136, 0.25);
+            --accent-soft: rgba(13, 148, 136, 0.1); --accent-border: rgba(13, 148, 136, 0.3);
+            --status-bg: rgba(255, 255, 255, 0.6); --status-border: rgba(0, 0, 0, 0.06);
+            --btn-bg: rgba(0, 0, 0, 0.04); --btn-border: rgba(0, 0, 0, 0.1); --btn-hover-bg: rgba(0, 0, 0, 0.08);
+            --dropzone-border: rgba(13, 148, 136, 0.35); --dropzone-bg: rgba(13, 148, 136, 0.04); --dropzone-hover-bg: rgba(13, 148, 136, 0.1);
+            --file-item-bg: rgba(0, 0, 0, 0.03); --file-item-border: rgba(0, 0, 0, 0.05);
+            --progress-bg: rgba(0, 0, 0, 0.06); --progress-bar-bg: rgba(0, 0, 0, 0.08);
+            --log-time: #6a8a9e; --input-bg: #f8fdfc; --input-border: #a8d5cf;
+            --shadow-color: rgba(0, 0, 0, 0.12); --inset-highlight: rgba(255, 255, 255, 0.9); --inset-soft: rgba(0, 0, 0, 0.02);
+            --receive-accent: #6366f1; --receive-accent-glow: rgba(99, 102, 241, 0.25);
+            --receive-accent-soft: rgba(99, 102, 241, 0.1); --receive-accent-border: rgba(99, 102, 241, 0.3);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Inter', 'Segoe UI', Roboto, sans-serif;
-            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease;
-        }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(145deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-
-        .app-container {
-            max-width: 1100px;
-            width: 100%;
-            background: var(--panel-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 2.5rem;
-            padding: 2rem 2rem 2.2rem;
-            box-shadow: 0 25px 50px -8px var(--shadow-color), inset 0 1px 1px var(--inset-highlight);
-            border: 1px solid var(--panel-border);
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.6rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-icon {
-            background: var(--accent);
-            width: 44px;
-            height: 44px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 16px -4px var(--accent-glow);
-        }
-
-        .logo-icon svg {
-            width: 26px;
-            height: 26px;
-            fill: var(--bg-grad-start);
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Inter', 'Segoe UI', Roboto, sans-serif; transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease; }
+        body { min-height: 100vh; background: linear-gradient(145deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%); display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+        .app-container { max-width: 1100px; width: 100%; background: var(--panel-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 2.5rem; padding: 2rem 2rem 2.2rem; box-shadow: 0 25px 50px -8px var(--shadow-color), inset 0 1px 1px var(--inset-highlight); border: 1px solid var(--panel-border); }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.6rem; flex-wrap: wrap; gap: 1rem; }
+        .logo-area { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-icon { background: var(--accent); width: 44px; height: 44px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px -4px var(--accent-glow); }
+        .logo-icon svg { width: 26px; height: 26px; fill: var(--bg-grad-start); }
         body.light .logo-icon svg { fill: #fff; }
-
-        .logo-text {
-            font-size: 1.8rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            color: var(--text-primary);
-        }
-
+        .logo-text { font-size: 1.8rem; font-weight: 600; letter-spacing: -0.02em; color: var(--text-primary); }
         .logo-text span { color: var(--accent); font-weight: 700; }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .badge {
-            background: var(--accent-soft);
-            padding: 0.5rem 1.1rem;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--accent);
-            border: 1px solid var(--accent-border);
-            letter-spacing: 0.3px;
-        }
-
-        .theme-toggle {
-            background: var(--btn-bg);
-            border: 1px solid var(--btn-border);
-            color: var(--text-secondary);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            transition: all 0.2s ease;
-        }
-
-        .theme-toggle:hover {
-            background: var(--btn-hover-bg);
-            border-color: var(--accent-border);
-            transform: rotate(15deg);
-        }
-
-        .mode-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.8rem;
-            background: var(--status-bg);
-            padding: 0.5rem;
-            border-radius: 60px;
-            margin-bottom: 1.6rem;
-            border: 1px solid var(--status-border);
-        }
-
-        .mode-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.6rem;
-            padding: 0.85rem 1rem;
-            border-radius: 50px;
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            letter-spacing: 0.2px;
-        }
-
-        .mode-btn:hover:not(.active) {
-            color: var(--text-secondary);
-            background: var(--btn-bg);
-        }
-
+        .header-right { display: flex; align-items: center; gap: 0.8rem; }
+        .badge { background: var(--accent-soft); padding: 0.5rem 1.1rem; border-radius: 40px; font-size: 0.85rem; font-weight: 500; color: var(--accent); border: 1px solid var(--accent-border); letter-spacing: 0.3px; }
+        .theme-toggle { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text-secondary); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: all 0.2s ease; }
+        .theme-toggle:hover { background: var(--btn-hover-bg); border-color: var(--accent-border); transform: rotate(15deg); }
+        .mode-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; background: var(--status-bg); padding: 0.5rem; border-radius: 60px; margin-bottom: 1.6rem; border: 1px solid var(--status-border); }
+        .mode-btn { display: flex; align-items: center; justify-content: center; gap: 0.6rem; padding: 0.85rem 1rem; border-radius: 50px; background: transparent; border: 1px solid transparent; color: var(--text-muted); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease; letter-spacing: 0.2px; }
+        .mode-btn:hover:not(.active) { color: var(--text-secondary); background: var(--btn-bg); }
         .mode-btn .mode-icon { font-size: 1.15rem; }
-
-        .mode-btn.active[data-mode="send"] {
-            background: var(--accent-soft);
-            color: var(--accent);
-            border-color: var(--accent-border);
-            box-shadow: 0 4px 14px -4px var(--accent-glow);
-        }
-
-        .mode-btn.active[data-mode="receive"] {
-            background: var(--receive-accent-soft);
-            color: var(--receive-accent);
-            border-color: var(--receive-accent-border);
-            box-shadow: 0 4px 14px -4px var(--receive-accent-glow);
-        }
-
-        .status-panel {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--status-bg);
-            border-radius: 80px;
-            padding: 0.6rem 1.5rem 0.6rem 1.8rem;
-            margin-bottom: 1.6rem;
-            border: 1px solid var(--status-border);
-            gap: 1rem;
-        }
-
-        .peer-status {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            font-weight: 450;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--text-muted);
-            transition: background 0.2s, box-shadow 0.2s;
-        }
-
-        .dot.connected {
-            background: var(--accent);
-            box-shadow: 0 0 12px var(--accent);
-        }
-
-        .dot.waiting {
-            background: #fbbf24;
-            box-shadow: 0 0 10px #fbbf24;
-        }
-
-        .pair-id {
-            font-family: 'SF Mono', 'JetBrains Mono', monospace;
-            font-size: 1rem;
-            background: var(--btn-bg);
-            padding: 0.4rem 1rem;
-            border-radius: 40px;
-            color: var(--text-secondary);
-            letter-spacing: 0.5px;
-            border: 1px solid var(--btn-border);
-            word-break: break-all;
-        }
-
+        .mode-btn.active[data-mode="send"] { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); box-shadow: 0 4px 14px -4px var(--accent-glow); }
+        .mode-btn.active[data-mode="receive"] { background: var(--receive-accent-soft); color: var(--receive-accent); border-color: var(--receive-accent-border); box-shadow: 0 4px 14px -4px var(--receive-accent-glow); }
+        .status-panel { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; background: var(--status-bg); border-radius: 80px; padding: 0.6rem 1.5rem 0.6rem 1.8rem; margin-bottom: 1.6rem; border: 1px solid var(--status-border); gap: 1rem; }
+        .peer-status { display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary); font-size: 0.95rem; font-weight: 450; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--text-muted); transition: background 0.2s, box-shadow 0.2s; }
+        .dot.connected { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+        .dot.waiting { background: #fbbf24; box-shadow: 0 0 10px #fbbf24; }
+        .pair-id { font-family: 'SF Mono', 'JetBrains Mono', monospace; font-size: 1rem; background: var(--btn-bg); padding: 0.4rem 1rem; border-radius: 40px; color: var(--text-secondary); letter-spacing: 0.5px; border: 1px solid var(--btn-border); word-break: break-all; }
         .pair-id strong { color: var(--accent); font-weight: 600; }
-
-        .action-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            align-items: center;
-        }
-
-        .btn {
-            background: var(--btn-bg);
-            border: 1px solid var(--btn-border);
-            color: var(--text-primary);
-            padding: 0.7rem 1.4rem;
-            border-radius: 40px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .btn:hover:not(:disabled) {
-            background: var(--btn-hover-bg);
-            border-color: var(--accent-border);
-            transform: translateY(-1px);
-        }
-
-        .btn:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            filter: grayscale(0.5);
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: #fff;
-            font-weight: 600;
-            box-shadow: 0 6px 14px -4px var(--accent-glow);
-        }
-
+        .action-buttons { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; }
+        .btn { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text-primary); padding: 0.7rem 1.4rem; border-radius: 40px; font-weight: 500; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; transition: all 0.15s ease; }
+        .btn:hover:not(:disabled) { background: var(--btn-hover-bg); border-color: var(--accent-border); transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; filter: grayscale(0.5); }
+        .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; box-shadow: 0 6px 14px -4px var(--accent-glow); }
         body.light .btn-primary { color: #fff; }
-
-        .btn-primary:hover:not(:disabled) {
-            background: var(--accent-hover);
-            border-color: var(--accent-hover);
-            color: #0b1a2e;
-        }
-
+        .btn-primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); color: #0b1a2e; }
         body.light .btn-primary:hover:not(:disabled) { color: #fff; }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--accent-border);
-            color: var(--accent);
-        }
-
-        .main-area {
-            margin-top: 0.5rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 2rem;
-            padding: 1.6rem 1.6rem 1.8rem;
-            border: 1px solid var(--card-border);
-            box-shadow: inset 0 1px 0 var(--inset-soft);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.75rem;
-            margin-bottom: 1.4rem;
-        }
-
+        .btn-outline { background: transparent; border: 1px solid var(--accent-border); color: var(--accent); }
+        .main-area { margin-top: 0.5rem; }
+        .card { background: var(--card-bg); border-radius: 2rem; padding: 1.6rem 1.6rem 1.8rem; border: 1px solid var(--card-border); box-shadow: inset 0 1px 0 var(--inset-soft); display: flex; flex-direction: column; }
+        .card-title { display: flex; align-items: center; gap: 0.7rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; margin-bottom: 1.4rem; }
         .card-title svg { width: 18px; height: 18px; fill: var(--accent); opacity: 0.9; }
-
         .card-title.receive-title svg { fill: var(--receive-accent); }
-
-        .dropzone {
-            border: 2px dashed var(--dropzone-border);
-            border-radius: 1.8rem;
-            padding: 1.8rem 1rem 2rem;
-            text-align: center;
-            cursor: pointer;
-            background: var(--dropzone-bg);
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 0.9rem;
-        }
-
-        .dropzone.dragover {
-            border-color: var(--accent);
-            background: var(--dropzone-hover-bg);
-            box-shadow: 0 0 20px var(--accent-soft);
-        }
-
+        .dropzone { border: 2px dashed var(--dropzone-border); border-radius: 1.8rem; padding: 1.8rem 1rem 2rem; text-align: center; cursor: pointer; background: var(--dropzone-bg); flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.9rem; }
+        .dropzone.dragover { border-color: var(--accent); background: var(--dropzone-hover-bg); box-shadow: 0 0 20px var(--accent-soft); }
         .drop-icon { font-size: 2.2rem; opacity: 0.9; }
-
-        .drop-text {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
+        .drop-text { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; }
         .drop-text strong { color: var(--accent); font-weight: 600; }
-
-        .drop-actions {
-            display: flex;
-            gap: 0.6rem;
-            margin-top: 0.4rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .drop-actions .btn {
-            padding: 0.5rem 1.1rem;
-            font-size: 0.82rem;
-        }
-
+        .drop-actions { display: flex; gap: 0.6rem; margin-top: 0.4rem; flex-wrap: wrap; justify-content: center; }
+        .drop-actions .btn { padding: 0.5rem 1.1rem; font-size: 0.82rem; }
         .file-input { display: none; }
-
-        .file-list {
-            margin-top: 1.2rem;
-            max-height: 180px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            padding-right: 4px;
-        }
-
+        .file-list { margin-top: 1.2rem; max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; padding-right: 4px; }
         .file-list::-webkit-scrollbar { width: 4px; }
-        .file-list::-webkit-scrollbar-thumb {
-            background: var(--accent-border);
-            border-radius: 10px;
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--file-item-bg);
-            border-radius: 30px;
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            border: 1px solid var(--file-item-border);
-            gap: 0.6rem;
-        }
-
+        .file-list::-webkit-scrollbar-thumb { background: var(--accent-border); border-radius: 10px; }
+        .file-item { display: flex; align-items: center; justify-content: space-between; background: var(--file-item-bg); border-radius: 30px; padding: 0.5rem 1rem; font-size: 0.85rem; color: var(--text-secondary); border: 1px solid var(--file-item-border); gap: 0.6rem; }
         .file-icon { flex-shrink: 0; font-size: 1rem; }
-
-        .file-name {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            flex: 1;
-        }
-
-        .file-size {
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            font-weight: 400;
-            flex-shrink: 0;
-        }
-
-        .remove-file {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 1.2rem;
-            line-height: 1;
-            padding: 0 0.2rem;
-        }
-
+        .file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+        .file-size { color: var(--text-muted); font-size: 0.75rem; font-weight: 400; flex-shrink: 0; }
+        .remove-file { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 0 0.2rem; }
         .remove-file:hover { color: #f87171; }
-
-        .progress-area {
-            margin-top: 1.2rem;
-            background: var(--progress-bg);
-            border-radius: 40px;
-            padding: 0.6rem 1rem;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            border: 1px solid var(--btn-border);
-        }
-
-        .progress-bar-bg {
-            flex: 1;
-            height: 6px;
-            background: var(--progress-bar-bg);
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--accent);
-            border-radius: 20px;
-            transition: width 0.1s linear;
-            box-shadow: 0 0 8px var(--accent-glow);
-        }
-
-        .progress-fill.receive-fill {
-            background: var(--receive-accent);
-            box-shadow: 0 0 8px var(--receive-accent-glow);
-        }
-
-        .send-btn {
-            margin-top: 1.4rem;
-            width: 100%;
-            justify-content: center;
-            padding: 0.9rem;
-            font-size: 1rem;
-            letter-spacing: 0.3px;
-        }
-
-        .queue-stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 0.7rem;
-            padding: 0 0.3rem;
-        }
-
-        .receive-hero {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem 1rem;
-            border: 2px dashed var(--receive-accent-border);
-            border-radius: 1.8rem;
-            background: var(--receive-accent-soft);
-            gap: 1rem;
-            min-height: 240px;
-        }
-
-        .receive-hero-icon {
-            font-size: 3rem;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.08); opacity: 1; }
-        }
-
-        .receive-hero h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--receive-accent);
-            letter-spacing: 0.2px;
-        }
-
-        .receive-hero p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.5;
-            max-width: 320px;
-        }
-
-        .receive-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.8rem;
-            margin-top: 1.2rem;
-        }
-
-        .stat-box {
-            background: var(--file-item-bg);
-            border-radius: 1rem;
-            padding: 0.9rem 1rem;
-            border: 1px solid var(--file-item-border);
-            text-align: center;
-        }
-
-        .stat-box .stat-value {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            font-family: 'SF Mono', monospace;
-        }
-
-        .stat-box .stat-label {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-top: 0.2rem;
-        }
-
-        .transfer-log {
-            margin-top: 1.2rem;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            max-height: 120px;
-            overflow-y: auto;
-            border-top: 1px solid var(--btn-border);
-            padding-top: 0.8rem;
-        }
-
-        .log-entry {
-            padding: 0.15rem 0;
-            display: flex;
-            gap: 0.5rem;
-            align-items: baseline;
-        }
-
-        .log-time {
-            color: var(--log-time);
-            font-family: monospace;
-            font-size: 0.7rem;
-        }
-
-        .footer-note {
-            text-align: center;
-            margin-top: 1.8rem;
-            font-size: 0.75rem;
-            color: var(--text-faint);
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .footer-note span {
-            background: var(--btn-bg);
-            padding: 0.2rem 0.8rem;
-            border-radius: 30px;
-            border: 1px solid var(--btn-border);
-        }
-
+        .progress-area { margin-top: 1.2rem; background: var(--progress-bg); border-radius: 40px; padding: 0.6rem 1rem; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.8rem; border: 1px solid var(--btn-border); }
+        .progress-bar-bg { flex: 1; height: 6px; background: var(--progress-bar-bg); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 20px; transition: width 0.1s linear; box-shadow: 0 0 8px var(--accent-glow); }
+        .progress-fill.receive-fill { background: var(--receive-accent); box-shadow: 0 0 8px var(--receive-accent-glow); }
+        .send-btn { margin-top: 1.4rem; width: 100%; justify-content: center; padding: 0.9rem; font-size: 1rem; letter-spacing: 0.3px; }
+        .queue-stats { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.7rem; padding: 0 0.3rem; }
+        .receive-hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1.6rem 1rem; border: 2px dashed var(--receive-accent-border); border-radius: 1.8rem; background: var(--receive-accent-soft); gap: 1rem; min-height: 200px; }
+        .receive-hero-icon { font-size: 3rem; animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.08); opacity: 1; } }
+        .receive-hero h3 { font-size: 1.2rem; font-weight: 600; color: var(--receive-accent); letter-spacing: 0.2px; }
+        .receive-hero p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; max-width: 340px; }
+        .receive-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; margin-top: 0.4rem; }
+        .receive-actions .btn { padding: 0.55rem 1.1rem; font-size: 0.82rem; }
+        .receive-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1.2rem; }
+        .stat-box { background: var(--file-item-bg); border-radius: 1rem; padding: 0.9rem 1rem; border: 1px solid var(--file-item-border); text-align: center; }
+        .stat-box .stat-value { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); font-family: 'SF Mono', monospace; }
+        .stat-box .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 0.2rem; }
+        .transfer-log { margin-top: 1.2rem; font-size: 0.8rem; color: var(--text-muted); max-height: 120px; overflow-y: auto; border-top: 1px solid var(--btn-border); padding-top: 0.8rem; }
+        .log-entry { padding: 0.15rem 0; display: flex; gap: 0.5rem; align-items: baseline; }
+        .log-time { color: var(--log-time); font-family: monospace; font-size: 0.7rem; }
+        .footer-note { text-align: center; margin-top: 1.8rem; font-size: 0.75rem; color: var(--text-faint); display: flex; justify-content: center; gap: 0.5rem; align-items: center; }
+        .footer-note span { background: var(--btn-bg); padding: 0.2rem 0.8rem; border-radius: 30px; border: 1px solid var(--btn-border); }
         .hidden { display: none !important; }
-
         .connected-badge { color: var(--accent); font-weight: 500; }
-
-        .signaling-panel {
-            margin-bottom: 1.6rem;
-            padding: 1.2rem 1.5rem;
-            background: var(--status-bg);
-            border-radius: 2rem;
-            border: 1px solid var(--accent-border);
-        }
-
-        .signaling-panel .textarea {
-            width: 100%;
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 1rem;
-            padding: 0.8rem;
-            color: var(--text-secondary);
-            font-family: monospace;
-            font-size: 0.75rem;
-            resize: vertical;
-        }
-
-        .signaling-label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 0.3rem;
-        }
-
-        @media (max-width: 700px) {
-            .app-container { padding: 1.5rem; }
-            .status-panel { border-radius: 1.5rem; padding: 1rem 1.2rem; }
-            .mode-btn { padding: 0.7rem 0.6rem; font-size: 0.85rem; }
-            .mode-btn .mode-icon { font-size: 1rem; }
-        }
+        .signaling-panel { margin-bottom: 1.6rem; padding: 1.2rem 1.5rem; background: var(--status-bg); border-radius: 2rem; border: 1px solid var(--accent-border); }
+        .signaling-panel .textarea { width: 100%; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 1rem; padding: 0.8rem; color: var(--text-secondary); font-family: monospace; font-size: 0.75rem; resize: vertical; }
+        .signaling-label { font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem; }
+        .receive-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.7rem; padding: 0.6rem 0.9rem; background: var(--progress-bg); border-radius: 0.8rem; border: 1px solid var(--btn-border); line-height: 1.5; }
+        .receive-hint strong { color: var(--text-secondary); }
+        .fs-supported { color: var(--accent); }
+        .fs-unsupported { color: #fbbf24; }
+        @media (max-width: 700px) { .app-container { padding: 1.5rem; } .status-panel { border-radius: 1.5rem; padding: 1rem 1.2rem; } .mode-btn { padding: 0.7rem 0.6rem; font-size: 0.85rem; } .mode-btn .mode-icon { font-size: 1rem; } }
     </style>
 </head>
 <body>
@@ -696,9 +136,7 @@
     <div class="header">
         <div class="logo-area">
             <div class="logo-icon">
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
             </div>
             <div class="logo-text">Local<span>Drop</span></div>
         </div>
@@ -709,12 +147,8 @@
     </div>
 
     <div class="mode-selector">
-        <button id="modeSendBtn" class="mode-btn active" data-mode="send">
-            <span class="mode-icon">📤</span> Send files
-        </button>
-        <button id="modeReceiveBtn" class="mode-btn" data-mode="receive">
-            <span class="mode-icon">📥</span> Receive files
-        </button>
+        <button id="modeSendBtn" class="mode-btn active" data-mode="send"><span class="mode-icon">📤</span> Send files</button>
+        <button id="modeReceiveBtn" class="mode-btn" data-mode="receive"><span class="mode-icon">📥</span> Receive files</button>
     </div>
 
     <div class="status-panel">
@@ -722,9 +156,7 @@
             <div id="connectionDot" class="dot waiting"></div>
             <span id="peerStatusText">Waiting for peer…</span>
         </div>
-        <div id="pairIdDisplay" class="pair-id">
-            <strong>PEER:</strong> <span id="roomCode">connecting…</span>
-        </div>
+        <div id="pairIdDisplay" class="pair-id"><strong>PEER:</strong> <span id="roomCode">connecting…</span></div>
         <div class="action-buttons">
             <button id="togglePairingBtn" class="btn" title="Show/hide pairing panel">🔗 Pair</button>
         </div>
@@ -735,7 +167,6 @@
             <span>🔗 Pair with the other laptop</span>
             <button id="closePairingPanel" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
         </div>
-
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
             <div>
                 <label class="signaling-label">Your peer ID (share this)</label>
@@ -743,9 +174,7 @@
                     <input id="myPeerId" readonly class="textarea" style="flex:1; padding:0.7rem; font-size:0.85rem;" value="connecting…">
                     <button id="copyPeerIdBtn" class="btn" style="padding:0.5rem 1rem;">Copy</button>
                 </div>
-                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem;">
-                    Tell the other laptop this ID so they can connect to you.
-                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem;">Tell the other laptop this ID so they can connect to you.</div>
             </div>
             <div>
                 <label class="signaling-label">Connect to a peer</label>
@@ -753,26 +182,17 @@
                     <input id="remotePeerId" class="textarea" style="flex:1; padding:0.7rem; font-size:0.85rem;" placeholder="Paste their ID here…">
                     <button id="connectPeerBtn" class="btn btn-primary" style="padding:0.5rem 1rem;">Connect</button>
                 </div>
-                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem;">
-                    Only one laptop needs to click Connect — the other will auto-accept.
-                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem;">Only one laptop needs to click Connect — the other will auto-accept.</div>
             </div>
         </div>
     </div>
 
     <div class="main-area">
         <div id="sendView" class="card">
-            <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                files queued to send
-            </div>
-
+            <div class="card-title"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> files queued to send</div>
             <div id="dropzone" class="dropzone">
                 <div class="drop-icon">📂</div>
-                <div class="drop-text">
-                    <strong>Drop files or folders</strong><br>
-                    or click below to browse · stays on device
-                </div>
+                <div class="drop-text"><strong>Drop files or folders</strong><br>or click below to browse · stays on device</div>
                 <div class="drop-actions">
                     <button id="pickFilesBtn" class="btn">📄 Pick files</button>
                     <button id="pickFolderBtn" class="btn">📁 Pick folder</button>
@@ -780,53 +200,40 @@
                 <input type="file" id="fileInput" class="file-input" multiple>
                 <input type="file" id="folderInput" class="file-input" webkitdirectory directory multiple>
             </div>
-
             <div id="fileList" class="file-list"></div>
-            <div class="queue-stats">
-                <span id="queueCount">0 items</span>
-                <span id="queueSize">0 B</span>
-            </div>
-
+            <div class="queue-stats"><span id="queueCount">0 items</span><span id="queueSize">0 B</span></div>
             <div id="sendProgressContainer" class="progress-area hidden">
                 <span id="sendProgressLabel">0%</span>
-                <div class="progress-bar-bg">
-                    <div id="sendProgressFill" class="progress-fill" style="width: 0%"></div>
-                </div>
+                <div class="progress-bar-bg"><div id="sendProgressFill" class="progress-fill" style="width: 0%"></div></div>
             </div>
-
-            <button id="sendBtn" class="btn btn-primary send-btn" disabled>
-                ⚡ Send files
-            </button>
+            <button id="sendBtn" class="btn btn-primary send-btn" disabled>⚡ Send files</button>
         </div>
 
         <div id="receiveView" class="card hidden">
-            <div class="card-title receive-title">
-                <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM9 8h6v2H9zm0 4h6v2H9z"/></svg>
-                waiting for incoming files
-            </div>
+            <div class="card-title receive-title"><svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM9 8h6v2H9zm0 4h6v2H9z"/></svg> waiting for incoming files</div>
 
             <div class="receive-hero">
                 <div class="receive-hero-icon">📥</div>
                 <h3>Ready to receive</h3>
-                <p>Files will automatically download as they arrive. Keep this tab open and make sure you're paired with the sender.</p>
+                <p>Files will land in the destination folder you pick below. Folder structure is preserved.</p>
+                <div class="receive-actions">
+                    <button id="pickDestBtn" class="btn">📁 Choose destination folder</button>
+                    <button id="clearDestBtn" class="btn btn-outline" style="display:none;">✕ Clear</button>
+                </div>
+            </div>
+
+            <div id="destHint" class="receive-hint">
+                <span class="fs-supported">📁 Folder mode available</span> — pick a destination folder and folders will be recreated inside it.
             </div>
 
             <div class="receive-stats">
-                <div class="stat-box">
-                    <div class="stat-value" id="incomingCount">0</div>
-                    <div class="stat-label">Files received</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="incomingBytes">0 B</div>
-                    <div class="stat-label">Total size</div>
-                </div>
+                <div class="stat-box"><div class="stat-value" id="incomingCount">0</div><div class="stat-label">Files received</div></div>
+                <div class="stat-box"><div class="stat-value" id="incomingBytes">0 B</div><div class="stat-label">Total size</div></div>
             </div>
 
             <div id="receiveProgressContainer" class="progress-area">
                 <span id="receiveProgressLabel">idle</span>
-                <div class="progress-bar-bg">
-                    <div id="receiveProgressFill" class="progress-fill receive-fill" style="width: 0%"></div>
-                </div>
+                <div class="progress-bar-bg"><div id="receiveProgressFill" class="progress-fill receive-fill" style="width: 0%"></div></div>
             </div>
 
             <div id="transferLog" class="transfer-log">
@@ -835,11 +242,7 @@
         </div>
     </div>
 
-    <div class="footer-note">
-        <span>direct P2P</span>
-        <span>no upload</span>
-        <span>WebRTC</span>
-    </div>
+    <div class="footer-note"><span>direct P2P</span><span>no upload</span><span>WebRTC</span></div>
 </div>
 
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -867,25 +270,18 @@
     const modeReceiveBtn = document.getElementById('modeReceiveBtn');
     const sendView = document.getElementById('sendView');
     const receiveView = document.getElementById('receiveView');
-
     let currentMode = localStorage.getItem('localdrop-mode') || 'send';
-
     function setMode(mode) {
         currentMode = mode;
         localStorage.setItem('localdrop-mode', mode);
         if (mode === 'send') {
-            modeSendBtn.classList.add('active');
-            modeReceiveBtn.classList.remove('active');
-            sendView.classList.remove('hidden');
-            receiveView.classList.add('hidden');
+            modeSendBtn.classList.add('active'); modeReceiveBtn.classList.remove('active');
+            sendView.classList.remove('hidden'); receiveView.classList.add('hidden');
         } else {
-            modeReceiveBtn.classList.add('active');
-            modeSendBtn.classList.remove('active');
-            receiveView.classList.remove('hidden');
-            sendView.classList.add('hidden');
+            modeReceiveBtn.classList.add('active'); modeSendBtn.classList.remove('active');
+            receiveView.classList.remove('hidden'); sendView.classList.add('hidden');
         }
     }
-
     modeSendBtn.addEventListener('click', () => setMode('send'));
     modeReceiveBtn.addEventListener('click', () => setMode('receive'));
 
@@ -921,6 +317,21 @@
     const remotePeerIdEl = document.getElementById('remotePeerId');
     const connectPeerBtn = document.getElementById('connectPeerBtn');
     const copyPeerIdBtn = document.getElementById('copyPeerIdBtn');
+
+    const pickDestBtn = document.getElementById('pickDestBtn');
+    const clearDestBtn = document.getElementById('clearDestBtn');
+    const destHint = document.getElementById('destHint');
+
+    // ---------- FS ACCESS SUPPORT ----------
+    const FS_SUPPORTED = typeof window.showDirectoryPicker === 'function';
+    if (!FS_SUPPORTED) {
+        pickDestBtn.disabled = true;
+        pickDestBtn.title = 'Your browser does not support the File System Access API. Use Chrome or Edge.';
+        destHint.innerHTML = `<span class="fs-unsupported">⚠️ Folder mode unavailable</span> — your browser doesn't support the File System Access API. Files will download individually to your default Downloads folder. For folder-aware transfers, use Chrome or Edge.`;
+    }
+
+    let destinationHandle = null;   // FileSystemDirectoryHandle
+    let currentFolderWriteQueue = Promise.resolve();
 
     // ---------- STATE ----------
     let peer = null;
@@ -979,7 +390,7 @@
         sendBtn.disabled = pendingFiles.length === 0 || !isConnected || isSending;
     }
 
-    // ---------- PEERJS SETUP ----------
+    // ---------- PEERJS ----------
     function makePeerId() {
         const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
         let id = 'localdrop-';
@@ -989,20 +400,11 @@
 
     function initPeer() {
         let storedId = localStorage.getItem('localdrop-peer-id');
-        if (!storedId) {
-            storedId = makePeerId();
-            localStorage.setItem('localdrop-peer-id', storedId);
-        }
-
-        peer = new Peer(storedId, {
-            config: { iceServers: ICE_SERVERS },
-            debug: 1
-        });
+        if (!storedId) { storedId = makePeerId(); localStorage.setItem('localdrop-peer-id', storedId); }
+        peer = new Peer(storedId, { config: { iceServers: ICE_SERVERS }, debug: 1 });
 
         peer.on('open', (id) => {
-            myPeerId = id;
-            myPeerIdEl.value = id;
-            roomCodeEl.textContent = id;
+            myPeerId = id; myPeerIdEl.value = id; roomCodeEl.textContent = id;
             log('Peer ready · ID: ' + id);
             updateConnectionStatus('waiting');
         });
@@ -1018,9 +420,7 @@
         });
 
         peer.on('connection', (conn) => {
-            if (activeConnection) {
-                try { activeConnection.close(); } catch (e) {}
-            }
+            if (activeConnection) { try { activeConnection.close(); } catch (e) {} }
             activeConnection = conn;
             setupPeerConnection(conn);
             log('Incoming connection from ' + conn.peer);
@@ -1035,13 +435,12 @@
 
     function setupPeerConnection(conn) {
         conn.on('open', () => {
-            dataChannel = conn;
-            isConnected = true;
+            dataChannel = conn; isConnected = true;
             updateConnectionStatus('connected');
             log('Peer connected · ready to transfer');
         });
 
-        conn.on('data', (data) => {
+        conn.on('data', async (data) => {
             if (typeof data === 'string') {
                 try {
                     const msg = JSON.parse(data);
@@ -1050,24 +449,17 @@
                         showReceiveProgress(0, msg.path || msg.name, msg.size);
                         log(`Receiving: ${msg.path || msg.name} (${formatSize(msg.size)})`);
                     } else if (msg.type === 'file-end' && receivingFile) {
-                        const blob = new Blob(receivingFile.chunks);
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = receivingFile.path || receivingFile.name;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        setTimeout(() => URL.revokeObjectURL(url), 5000);
+                        const fileToWrite = receivingFile;
+                        receivingFile = null;
+                        await saveReceivedFile(fileToWrite);
                         receivedFileCount++;
-                        receivedBytesTotal += receivingFile.size;
+                        receivedBytesTotal += fileToWrite.size;
                         incomingCountEl.textContent = receivedFileCount;
                         incomingBytesEl.textContent = formatSize(receivedBytesTotal);
-                        log(`Received: ${receivingFile.path || receivingFile.name}`);
-                        receivingFile = null;
                         hideReceiveProgress();
+                        log(`Received: ${fileToWrite.path}`);
                     }
-                } catch (e) {}
+                } catch (e) { log('Parse error: ' + e.message); }
             } else if (receivingFile) {
                 receivingFile.chunks.push(data);
                 const received = receivingFile.chunks.reduce((a, c) => a + c.byteLength, 0);
@@ -1077,8 +469,7 @@
         });
 
         conn.on('close', () => {
-            isConnected = false;
-            dataChannel = null;
+            isConnected = false; dataChannel = null;
             updateConnectionStatus('waiting');
             log('Peer disconnected');
         });
@@ -1086,33 +477,87 @@
         conn.on('error', (err) => log('Connection error: ' + err));
     }
 
-    // ---------- PAIRING UI EVENTS ----------
+    // ---------- RECEIVE: SAVE FILE (folder-aware) ----------
+    async function saveReceivedFile(fileObj) {
+        const blob = new Blob(fileObj.chunks);
+        const path = fileObj.path || fileObj.name;
+
+        // If we have a destination folder handle, recreate the path inside it.
+        if (destinationHandle) {
+            try {
+                await writeIntoDirectory(destinationHandle, path, blob);
+                return;
+            } catch (e) {
+                log('Folder write failed: ' + e.message + ' — falling back to download');
+            }
+        }
+
+        // Fallback: browser download (flat, default Downloads folder)
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = path.split('/').pop() || fileObj.name;   // filename only
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+
+    async function writeIntoDirectory(rootHandle, path, blob) {
+        const parts = path.split('/').filter(Boolean);
+        const fileName = parts.pop();
+        let dirHandle = rootHandle;
+
+        // Create/walk subdirectories
+        for (const part of parts) {
+            dirHandle = await dirHandle.getDirectoryHandle(part, { create: true });
+        }
+
+        const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+    }
+
+    // ---------- DESTINATION PICKER ----------
+    pickDestBtn.addEventListener('click', async () => {
+        if (!FS_SUPPORTED) return;
+        try {
+            destinationHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            clearDestBtn.style.display = 'inline-flex';
+            destHint.innerHTML = `<span class="fs-supported">📁 Folder mode active</span> — incoming folders will be recreated inside <strong>${destinationHandle.name}</strong>.`;
+            log(`Destination folder set: ${destinationHandle.name}`);
+        } catch (e) {
+            if (e.name !== 'AbortError') log('Folder pick cancelled');
+        }
+    });
+
+    clearDestBtn.addEventListener('click', () => {
+        destinationHandle = null;
+        clearDestBtn.style.display = 'none';
+        destHint.innerHTML = `<span class="fs-supported">📁 Folder mode available</span> — pick a destination folder and folders will be recreated inside it.`;
+        log('Destination folder cleared');
+    });
+
+    // ---------- PAIRING UI ----------
     togglePairingBtn.addEventListener('click', () => {
         pairingPanel.style.display = pairingPanel.style.display === 'none' ? 'block' : 'none';
     });
-
-    document.getElementById('closePairingPanel').addEventListener('click', () => {
-        pairingPanel.style.display = 'none';
-    });
-
+    document.getElementById('closePairingPanel').addEventListener('click', () => { pairingPanel.style.display = 'none'; });
     copyPeerIdBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(myPeerIdEl.value)
-            .then(() => log('Peer ID copied'))
-            .catch(() => log('Copy failed'));
+        navigator.clipboard.writeText(myPeerIdEl.value).then(() => log('Peer ID copied')).catch(() => log('Copy failed'));
     });
-
     connectPeerBtn.addEventListener('click', () => {
         const remoteId = remotePeerIdEl.value.trim();
         if (!remoteId) { log('Enter a peer ID first'); return; }
-        if (remoteId === myPeerIdEl.value) { log('That\'s your own ID'); return; }
-
+        if (remoteId === myPeerIdEl.value) { log("That's your own ID"); return; }
         log('Connecting to ' + remoteId + '…');
         const conn = peer.connect(remoteId, { reliable: true });
         activeConnection = conn;
         setupPeerConnection(conn);
     });
 
-    // ---------- SEND LOGIC ----------
+    // ---------- SEND ----------
     function startSending() {
         if (!dataChannel || !dataChannel.open) { log('Peer not connected'); return; }
         if (pendingFiles.length === 0 || isSending) return;
@@ -1155,8 +600,7 @@
         reader.onload = (e) => {
             if (!dataChannel || !dataChannel.open) {
                 log('Connection lost during send');
-                isSending = false;
-                sendBtn.disabled = false;
+                isSending = false; sendBtn.disabled = false;
                 return;
             }
             const chunk = e.target.result;
@@ -1174,33 +618,23 @@
                 setTimeout(() => sendNextFile(), 150);
             }
         };
-        reader.onerror = (err) => {
-            log('Read error: ' + err.message);
-            isSending = false;
-            sendBtn.disabled = false;
-        };
+        reader.onerror = (err) => { log('Read error: ' + err.message); isSending = false; sendBtn.disabled = false; };
         reader.readAsArrayBuffer(slice);
     }
 
-    // ---------- PROGRESS UI ----------
+    // ---------- PROGRESS ----------
     function showSendProgress(pct, name) {
         sendProgressContainer.classList.remove('hidden');
         sendProgressFill.style.width = pct + '%';
         sendProgressLabel.textContent = `${pct}%${name ? ' · ' + name : ''}`;
     }
-    function hideSendProgress() {
-        sendProgressContainer.classList.add('hidden');
-        sendProgressFill.style.width = '0%';
-    }
+    function hideSendProgress() { sendProgressContainer.classList.add('hidden'); sendProgressFill.style.width = '0%'; }
     function showReceiveProgress(pct, name) {
         receiveProgressContainer.classList.remove('hidden');
         receiveProgressFill.style.width = pct + '%';
         receiveProgressLabel.textContent = `${pct}%${name ? ' · ' + name : ''}`;
     }
-    function hideReceiveProgress() {
-        receiveProgressFill.style.width = '0%';
-        receiveProgressLabel.textContent = 'idle';
-    }
+    function hideReceiveProgress() { receiveProgressFill.style.width = '0%'; receiveProgressLabel.textContent = 'idle'; }
 
     // ---------- FILE LIST ----------
     function renderFileList() {
@@ -1243,7 +677,7 @@
         log(`Added ${newEntries.length} item${newEntries.length !== 1 ? 's' : ''} to queue`);
     }
 
-    // ---------- DROPZONE EVENTS ----------
+    // ---------- DROPZONE ----------
     dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
     dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
     dropzone.addEventListener('drop', async (e) => {
@@ -1289,17 +723,10 @@
     pickFilesBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
     pickFolderBtn.addEventListener('click', (e) => { e.stopPropagation(); folderInput.click(); });
     dropzone.addEventListener('click', (e) => {
-        if (e.target === dropzone || e.target.classList.contains('drop-icon') || e.target.classList.contains('drop-text')) {
-            fileInput.click();
-        }
+        if (e.target === dropzone || e.target.classList.contains('drop-icon') || e.target.classList.contains('drop-text')) fileInput.click();
     });
-
-    fileInput.addEventListener('change', () => {
-        if (fileInput.files.length) { addFiles(fileInput.files); fileInput.value = ''; }
-    });
-    folderInput.addEventListener('change', () => {
-        if (folderInput.files.length) { addFiles(folderInput.files); folderInput.value = ''; }
-    });
+    fileInput.addEventListener('change', () => { if (fileInput.files.length) { addFiles(fileInput.files); fileInput.value = ''; } });
+    folderInput.addEventListener('change', () => { if (folderInput.files.length) { addFiles(folderInput.files); folderInput.value = ''; } });
 
     sendBtn.addEventListener('click', startSending);
 
